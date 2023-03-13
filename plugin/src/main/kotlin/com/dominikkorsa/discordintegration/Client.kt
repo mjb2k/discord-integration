@@ -140,10 +140,12 @@ class Client(private val plugin: DiscordIntegration) {
                         .asFlow()
                         .collect {
                             val chatChannels = plugin.configManager.chat.channels.map(Snowflake::of)
+                            val imageMapChannels = plugin.configManager.imagemaps.channels.map(Snowflake::of)
                             val consoleChannels = plugin.configManager.chat.consoleChannels.map(Snowflake::of)
                             val channelId = it.message.channelId
                             when {
-                                chatChannels.contains(channelId) -> onSyncedMessage(it.message)
+                                chatChannels.contains(channelId)
+                                        || imageMapChannels.contains(channelId) -> onSyncedMessage(it.message)
                                 consoleChannels.contains(channelId) -> onConsoleMessage(
                                     it.message,
                                     allowedConsoleChannels
