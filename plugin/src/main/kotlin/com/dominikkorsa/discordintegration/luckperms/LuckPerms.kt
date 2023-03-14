@@ -5,6 +5,7 @@ import net.luckperms.api.LuckPerms
 import org.bukkit.Bukkit
 import org.bukkit.plugin.RegisteredServiceProvider
 
+
 fun registerLuckPerms(plugin: DiscordIntegration): Boolean {
     val provider: RegisteredServiceProvider<LuckPerms> =
         Bukkit.getServicesManager().getRegistration(LuckPerms::class.java) ?: return false

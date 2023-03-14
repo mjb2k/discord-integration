@@ -151,13 +151,22 @@ class Db(private val plugin: DiscordIntegration) {
     }
 
     suspend fun setDiscordId(playerId: UUID, discordId: Snowflake): Pair<UUID?, Snowflake?>? {
+        // I believe these two lines check if the player has already been linked
         val previouslyLinkedPlayerId = playerOfMember.put(discordId, playerId)
         if (previouslyLinkedPlayerId == playerId) return null
 
+        // creates a player or gets the player object associated with playerId
         val playerBefore = getOrCreatePlayer(playerId)
+        // if player has a discordId delete it
         playerBefore.discordId?.let(playerOfMember::remove)
+
+        // assigns the hashmap players key := playerId to = Player(discordId)
         players[playerId] = playerBefore.withDiscordId(discordId)
+
+        // saves the mapping between playerId to DiscordId to players.yml file
         save()
+
+        // returns the mapping
         return Pair(previouslyLinkedPlayerId, playerBefore.discordId)
     }
 }

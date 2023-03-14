@@ -265,7 +265,7 @@ class Client(private val plugin: DiscordIntegration) {
                         message.channel.awaitFirstOrNull()?.let {
                             it.
                             createMessage(
-                                "Upload failed for file: %s %s".format(filename, message.author.get().mention)
+                                "Upload failed for file: %s %s, check logs".format(filename, message.author.get().mention)
                             ).withAllowedMentions(AllowedMentions.builder().allowUser(message.author.get().id).build())
                         }?.awaitFirstOrNull()
                     }
@@ -488,6 +488,8 @@ class Client(private val plugin: DiscordIntegration) {
             throw exception
         }
     }
+
+    fun getGuilds() = gateway?.guilds
 
     suspend fun getMember(guildId: Snowflake, userId: Snowflake) =
         gateway?.getMemberById(guildId, userId)?.handleNotFound()

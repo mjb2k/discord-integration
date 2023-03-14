@@ -11,9 +11,13 @@ import com.dominikkorsa.discordintegration.exception.MissingIntentsException
 import com.dominikkorsa.discordintegration.formatter.DiscordFormatter
 import com.dominikkorsa.discordintegration.formatter.EmojiFormatter
 import com.dominikkorsa.discordintegration.formatter.MinecraftFormatter
+import com.dominikkorsa.discordintegration.imagemaps.FileScanner
+import com.dominikkorsa.discordintegration.imagemaps.ImageMapsMigrator
 import com.dominikkorsa.discordintegration.linking.Linking
 import com.dominikkorsa.discordintegration.listener.*
 import com.dominikkorsa.discordintegration.luckperms.registerLuckPerms
+import com.dominikkorsa.discordintegration.plan.DiscordLinkingDataExtension
+import com.dominikkorsa.discordintegration.plan.PlanHook
 import com.dominikkorsa.discordintegration.update.UpdateCheckerService
 import com.dominikkorsa.discordintegration.utils.bunchLines
 import com.github.shynixn.mccoroutine.bukkit.launch
@@ -35,8 +39,6 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.time.Duration
 import kotlin.time.toKotlinDuration
 
-import com.dominikkorsa.discordintegration.imagemaps.FileScanner
-import com.dominikkorsa.discordintegration.imagemaps.ImageMapsMigrator
 
 class DiscordIntegration : JavaPlugin() {
     val client = Client(this)
@@ -49,9 +51,15 @@ class DiscordIntegration : JavaPlugin() {
     private val lockFileService = LockFileService(this)
     val updateCheckerService = UpdateCheckerService(this)
     lateinit var configManager: ConfigManager
+
     /* two object classes needed for imagemaps */
     val imageMapMigrator = ImageMapsMigrator(this)
     val fileScanner = FileScanner(this)
+
+    /* two object classes needed for plan integration */
+    val planHook = PlanHook(this)
+    val discordLinkingDataExtension = DiscordLinkingDataExtension(this)
+
     lateinit var messages: MessageManager
     private var dynmap: DynmapIntegration? = null
     private var activityJob: Job? = null
@@ -79,6 +87,12 @@ class DiscordIntegration : JavaPlugin() {
         startLogging()
         if (registerLuckPerms(this)) logger.info("Luck Perms integration enabled")
         else logger.info("Luck Perms not available")
+
+        try {
+            planHook.hookIntoPlan()
+        } catch (planIsNotInstalled: NoClassDefFoundError) {
+            logger.info("Plan | Player-Analytics not found, no action required.")
+        }
 
         this.launch {
             db.init()
