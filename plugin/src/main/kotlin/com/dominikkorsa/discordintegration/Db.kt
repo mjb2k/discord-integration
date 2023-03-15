@@ -169,4 +169,16 @@ class Db(private val plugin: DiscordIntegration) {
         // returns the mapping
         return Pair(previouslyLinkedPlayerId, playerBefore.discordId)
     }
+
+    private var playerTags = HashMap<UUID, String>()
+    fun setTagId(playerId: UUID, discordTag: String): Pair<UUID?, String?>? {
+        val previouslyLinkedPlayerTag = playerTags.put(playerId, discordTag)
+        if (previouslyLinkedPlayerTag == discordTag) return null
+
+        return Pair(playerId, previouslyLinkedPlayerTag)
+    }
+
+    fun getTagFromPlayerUUID(playerId: UUID): String? {
+        return playerTags[playerId]
+    }
 }

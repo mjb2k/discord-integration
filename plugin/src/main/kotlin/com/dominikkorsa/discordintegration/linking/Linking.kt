@@ -55,6 +55,8 @@ class Linking(private val plugin: DiscordIntegration) {
             }
             previousDiscordId?.let { plugin.client.updateMember(it) }
             plugin.client.updateMember(user.id)
+            // this will add the tag to the database playerTags var
+            plugin.db.setTagId(linkingCode.player.uniqueId, user.tag)
         }
         linkingCode.player.sendMessage(plugin.minecraftFormatter.formatLinkingSuccess(user))
         return linkingCode.player

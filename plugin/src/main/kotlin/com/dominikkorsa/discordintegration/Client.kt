@@ -97,6 +97,7 @@ class Client(private val plugin: DiscordIntegration) {
         initEmojis()
         initCommands()
         updateAllMembers()
+        storeUsernames()
     }
 
     suspend fun disconnect() {
@@ -489,7 +490,39 @@ class Client(private val plugin: DiscordIntegration) {
         }
     }
 
-    fun getGuilds() = gateway?.guilds
+    // will update the playerTags var with all the previously linked players and their
+    // respective tags IF they are not already in the mapping AND their accounts are
+    // linked. This is for backwards compatability with existing links for Plan.
+    suspend fun storeUsernames() = coroutineScope {
+        gateway
+            ?.guilds
+            ?.asFlow()
+            ?.map { guild ->
+                async {
+                    guild
+                        .members
+                        .asFlow()
+                        .map {
+                            async {
+                                // get an ID first from discord
+                                val id = it.id
+                                // get their respective player ID (null if not linked)
+                                val playerUUID = plugin.db.playerIdOfMember(id)
+                                // verified that this player is linked
+                                if (playerUUID != null) {
+                                    // get their existing tag (null if no tag available)
+                                    val tag = plugin.db.getTagFromPlayerUUID(playerUUID)
+                                    // verify their tag is not already included in map
+                                    if (tag == null) {
+                                        // set their playerUUID to be their tag in the map
+                                        plugin.db.setTagId(playerUUID, it.tag)
+                                    }
+                                }
+                            }
+                        }.toList().awaitAll()
+                    }
+                }?.toList()?.awaitAll()
+    }
 
     suspend fun getMember(guildId: Snowflake, userId: Snowflake) =
         gateway?.getMemberById(guildId, userId)?.handleNotFound()

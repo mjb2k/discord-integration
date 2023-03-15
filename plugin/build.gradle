@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.dominikkorsa.discordintegration'
-version '3.3.1'
+version '3.3.2'
 
 ext {
     ktor_version = '2.0.3'
@@ -28,7 +28,6 @@ dependencies {
     compileOnly 'org.dynmap:dynmap-api:2.0'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'com.github.plan-player-analytics:Plan:5.5.2272'
-    testCompileOnly 'com.github.plan-player-analytics:Plan:5.5.2272'
 
     implementation 'com.discord4j:discord4j-core:3.2.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2'
