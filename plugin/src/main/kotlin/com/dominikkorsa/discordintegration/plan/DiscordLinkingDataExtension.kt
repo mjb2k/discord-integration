@@ -4,6 +4,7 @@ import com.djrapitops.plan.extension.CallEvents
 import com.djrapitops.plan.extension.DataExtension
 import com.djrapitops.plan.extension.annotation.PluginInfo
 import com.djrapitops.plan.extension.annotation.StringProvider
+import com.djrapitops.plan.extension.Caller
 
 import com.dominikkorsa.discordintegration.DiscordIntegration
 
@@ -20,7 +21,8 @@ class DiscordLinkingDataExtension(private var plugin: DiscordIntegration) : Data
     override fun callExtensionMethodsOn(): Array<CallEvents?>? {
         return arrayOf(
             CallEvents.PLAYER_JOIN,
-            CallEvents.PLAYER_LEAVE
+            CallEvents.PLAYER_LEAVE,
+            CallEvents.MANUAL
         )
     }
 
@@ -34,4 +36,6 @@ class DiscordLinkingDataExtension(private var plugin: DiscordIntegration) : Data
 
         return plugin.db.getTagFromPlayerUUID(playerId) ?: "error with fetching tag"
     }
+
+
 }

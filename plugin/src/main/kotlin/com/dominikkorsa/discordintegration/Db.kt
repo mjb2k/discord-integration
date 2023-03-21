@@ -147,6 +147,8 @@ class Db(private val plugin: DiscordIntegration) {
         playerOfMember.remove(previousPlayer.discordId)
         players[playerId] = previousPlayer.withDiscordId(null)
         save()
+        // if a player deletes their Id, update the Plan data
+        plugin.planHook.caller?.get()?.updatePlayerData(playerId, null)
         return previousPlayer.discordId
     }
 

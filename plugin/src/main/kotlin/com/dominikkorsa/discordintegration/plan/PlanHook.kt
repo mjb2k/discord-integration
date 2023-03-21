@@ -2,9 +2,13 @@ package com.dominikkorsa.discordintegration.plan
 
 import com.djrapitops.plan.capability.CapabilityService
 import com.djrapitops.plan.extension.ExtensionService
+import com.djrapitops.plan.extension.Caller
 import com.dominikkorsa.discordintegration.DiscordIntegration
+import java.util.Optional
 
 class PlanHook(private var plugin: DiscordIntegration) {
+    var caller: Optional<Caller>? = null
+
      fun hookIntoPlan() {
         if (!this.areAllCapabilitiesAvailable()) return
         registerDataExtension()
@@ -17,7 +21,7 @@ class PlanHook(private var plugin: DiscordIntegration) {
 
     private fun registerDataExtension() {
         try {
-            ExtensionService.getInstance().register(plugin.discordLinkingDataExtension)
+            caller = ExtensionService.getInstance().register(plugin.discordLinkingDataExtension)
         } catch (e: IllegalStateException) {
             plugin.logger.warning("Plan is not enabled to handle discordLinkingDataExtension")
             // Plan is not enabled, handle exception

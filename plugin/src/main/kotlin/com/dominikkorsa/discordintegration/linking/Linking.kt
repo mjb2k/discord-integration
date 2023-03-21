@@ -12,6 +12,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 
 
+
 class Linking(private val plugin: DiscordIntegration) {
     private val linkingCodes = HashMap<String, LinkingCode>()
     private val linkingCodeQueue = Channel<LinkingCode>(8192)
@@ -56,7 +57,10 @@ class Linking(private val plugin: DiscordIntegration) {
             previousDiscordId?.let { plugin.client.updateMember(it) }
             plugin.client.updateMember(user.id)
             // this will add the tag to the database playerTags var
+            // and call the dataextension to update the player
+            // if plan not enabled then second line won't run since it's safe from null reference
             plugin.db.setTagId(linkingCode.player.uniqueId, user.tag)
+            plugin.planHook.caller?.get()?.updatePlayerData(linkingCode.player.uniqueId, linkingCode.player.name)
         }
         linkingCode.player.sendMessage(plugin.minecraftFormatter.formatLinkingSuccess(user))
         return linkingCode.player
